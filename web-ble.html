@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>蓝禾产测工具</title>
+	<link rel="icon" type="image/css" href="img/PCBA.svg">
+	<link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="style/style.css">
+	<script src="js/crcaes.js" type="text/javascript"></script>
+	<script src="js/productdata.js" type="text/javascript"></script>
+	<script src="js/userdb.js" type="text/javascript"></script>
+	<script src="js/config.js" type="text/javascript"></script>
+</head>
+<body>
+	<header class="bd-header bg-blue py-3 d-flex align-items-stretch border-bottom-0 border-dark">
+			<!-- container-fluid容器保持全屏大小，始终保持100%，当需要一个元素横跨视口的整个宽度，可以使用.container-fluid容器 -->
+			<div class="container-fluid d-flex align-items-center">
+				<h1 class="d-flex align-items-center fs-4 text-white mb-0">
+					LanHe Production Test Tool
+				</h1>
+			</div>
+	</header>
+
+	<div id="main" class="flex-fill px-md-2">
+		<!-- flex-shrink-0,不缩放 -->
+		<!-- mb-2:margin-bottom,元素下方与下一个的元素之间的距离 -->
+		<div class="flex-shrink-0 mb-2">
+			<div class="d-flex mt-2">
+				<button class="btn btn-primary ms-2 me-2" id="btn-scan-connect">扫描/连接</button>
+				<button class="btn btn-primary me-2" id="btn-test-start">开始测试</button>
+				<button class="btn btn-primary me-2" id="btn-dbdata-down">保存数据</button>
+				<button class="btn btn-primary me-2" id="btn-dbdata-clear">删除数据</button>
+			</div>
+		</div>
+
+		<div id="display-main" class="d-flex flex-column border border-2 rounded mb-2">
+			<div class="p-1 text-success">测试前设备信息上报:</div>
+			<div class="d-flex p-1 justify-content-around bg-light text-white">
+				<div class="d-inline-flex">
+					<span id="span-devicename" class="p-1 bg-info" style="font-size:0.75em">设备类型</span>
+					<input id="input-devicename" type="text" class="border border-2" disabled>
+				</div>
+
+				<div class="d-inline-flex">
+					<span id="span-devicever" class="p-1 bg-info" style="font-size:0.75em">固件版本</span>
+					<input id="input-devicever" type="text" class="border border-2" disabled>
+				</div>
+
+				<div class="d-inline-flex">
+					<span id="span-devicemac" class="p-1 bg-info" style="font-size:0.75em">MAC</span>
+					<input id="input-devicemac" type="text" class="border border-2" disabled>
+					<!-- <span class="p-2 bg-info input-group-addon"></span> -->
+				</div>
+
+				<div class="d-inline-flex">
+					<span id="span-batoff" class="p-1 bg-info" style="font-size:0.65em ;">上一次关机电压值</span>
+					<input id="input-batoff" type="text" class="border border-2" disabled>
+				</div>
+			</div>
+
+			<div class="d-flex p-1 justify-content-around bg-light text-white">
+				<div class="d-inline-flex">
+					<span id="span-baton" class="p-1 bg-info" style="font-size:0.65em ;">唤醒后电压值</span>
+					<input id="input-baton" type="text" class="border border-2" disabled>
+				</div>
+
+				<div class="d-inline-flex">
+					<span id="span-lefttec" class="p-1 bg-info" style="font-size:0.75em">左TEC温度</span>
+					<input id="input-lefttec" type="text" class="border border-2" disabled>
+				</div>
+
+				<div class="d-inline-flex">
+					<span id="span-righttec" class="p-1 bg-info" style="font-size:0.75em">右TEC温度</span>
+					<input id="input-righttec" type="text" class="border border-2" disabled>
+				</div>
+
+				<div class="d-inline-flex">
+					<span id="span-nature" class="p-1 bg-info" style="font-size:0.75em">环境温度</span>
+					<input id="input-nature" type="text" class="border border-2" disabled>
+				</div>
+			</div>
+
+			<div class="d-flex p-1 justify-content-around bg-light text-white">
+				<div class="d-inline-flex">
+					<span id="span-battemp" class="p-1 bg-info" style="font-size:0.75em ;">电池温度</span>
+					<input id="input-battemp" type="text" class="border border-2" disabled>
+				</div>
+
+				<div class="d-inline-flex">
+					<span id="span-batvol" class="p-1 bg-info" style="font-size:0.75em">当前电压值</span>
+					<input id="input-batvol" type="text" class="border border-2" disabled>
+				</div>
+
+				<!-- 隐藏一个输入框组，为了布局整齐 -->
+				<div class="d-inline-flex">
+					<span class="p-1" style="font-size:0.75em"></span>
+					<input type="text" class="bg-light border-light border-start-0 border-top-0" disabled>
+				</div>
+
+				<!-- 隐藏一个输入框组，为了布局整齐 -->
+				<div class="d-inline-flex">
+					<span class="p-1" style="font-size:0.75em"></span>
+					<input type="text" class="bg-light border-light border-start-0 border-top-0" disabled>
+				</div>
+			</div>
+
+			<div class="p-1 text-success">制冷后数据上报(10秒) :</div>
+			<div class="d-flex p-1 justify-content-around bg-light text-white">
+				<div class="d-inline-flex">
+					<span id="span-coldlefttec" class="p-1 bg-info" style="font-size:0.65em ;">左TEC温度</span>
+					<input id="input-coldlefttec" type="text" class="border border-2" disabled>
+				</div>
+
+				<div class="d-inline-flex">
+					<span id="span-coldrighttec" class="p-1 bg-info" style="font-size:0.75em">右TEC温度</span>
+					<input id="input-coldrighttec" type="text" class="border border-2" disabled>
+				</div>
+
+				<div class="d-inline-flex">
+					<span id="span-coldbatvol" class="p-1 bg-info" style="font-size:0.75em">当前电压值</span>
+					<input id="input-coldbatvol" type="text" class="border border-2" disabled>
+				</div>
+
+				<!-- 隐藏一个输入框组，为了布局整齐 -->
+				<div class="d-inline-flex">
+					<span class="p-1" style="font-size:0.75em"></span>
+					<input type="text" class="bg-light border-light border-start-0 border-top-0" disabled>
+				</div>
+			</div>
+
+			<div class="p-1 text-success">制热后数据上报(10秒) :</div>
+			<div class="d-flex p-1 justify-content-around bg-light text-white">
+				<div class="d-inline-flex">
+					<!-- <span class="p-1 bg-info input-group-text" style="font-size:0.65em ;">左TEC温度</span> -->
+					<span id="span-heatlefttec" class="p-1 bg-info" style="font-size:0.65em ;">左TEC温度</span>
+					<input id="input-heatlefttec" type="text" class="border border-2" disabled>
+				</div>
+
+				<div class="d-inline-flex">
+					<span id="span-heatrighttec" class="p-1 bg-info" style="font-size:0.75em">右TEC温度</span>
+					<input id="input-heatrighttec" type="text" class="border border-2" disabled>
+				</div>
+
+				<div class="d-inline-flex">
+					<span id="span-heatbatvol" class="p-1 bg-info" style="font-size:0.75em">当前电压值</span>
+					<input id="input-heatbatvol" type="text" class="border border-2" disabled>
+				</div>
+
+				<!-- 隐藏一个输入框组，为了布局整齐 -->
+				<div class="d-inline-flex">
+					<span class="p-1" style="font-size:0.75em"></span>
+					<input type="text" class="bg-light border-light border-start-0 border-top-0" disabled>
+				</div>
+			</div>
+
+			<div class="p-1 text-success">测试后数据上报:</div>
+			<div class="d-flex p-1 justify-content-around bg-light text-white">
+				<div class="d-inline-flex">
+					<!-- <span class="p-1 bg-info input-group-text" style="font-size:0.65em ;">左TEC温度</span> -->
+					<span id="span-finishbatvol" class="p-1 bg-info" style="font-size:0.65em ;">当前电压值</span>
+					<input id="input-finishbatvol" type="text" class="border border-2" disabled>
+				</div>
+
+				<div class="d-inline-flex">
+					<span id="span-finishnaturetemp" class="p-1 bg-info" style="font-size:0.75em">环境温度</span>
+					<input id="input-finishnaturetemp" type="text" class="border border-2" disabled>
+				</div>
+
+				<div class="d-inline-flex">
+					<span id="span-finishbattemp" class="p-1 bg-info" style="font-size:0.75em">电池温度</span>
+					<input id="input-finishbattemp" type="text" class="border border-2" disabled>
+				</div>
+
+				<!-- 隐藏一个输入框组，为了布局整齐 -->
+				<div class="d-inline-flex">
+					<span class="p-1" style="font-size:0.75em"></span>
+					<input type="text" class="bg-light border-light border-start-0 border-top-0" disabled>
+				</div>
+			</div>
+		</div>
+
+		<div id="log-main" class="flex-fill">
+			<div id="logs" class="flex-fill border border-2 rounded mb-2"></div>
+		</div>
+	</div>
+
+	<div id="toast">
+		自动熄灭!
+	</div>
+
+	<script type="text/javascript" src="js/interacte.js"></script>
+
+	<script type="text/javascript">
+		// let btnTestStart = document.querySelector("#btn-test-start");
+		// btnTestStart.disabled = true;
+		// let btnDBDataDown = document.querySelector("#btn-dbdata-down");
+		// btnDBDataDown.disabled = true;
+		// let btnDBDataClear = document.querySelector("#btn-dbdata-clear");
+		// btnDBDataClear.disabled = true;
+
+		// let spanDeviceNamea = document.getElementById("span-devicename");
+		// //通过这种方式可以修改被important修饰的css
+		// spanDeviceNamea.style.setProperty("background-color","red","important")
+	</script>
+	<script type="text/javascript">
+		let testNum;
+		if(window.localStorage)
+		{
+			let testNumStorage = window.localStorage;
+			if(testNumStorage.getItem("TestNum") != null)
+			{
+				let testnumstr = testNumStorage.getItem("TestNum");
+				testNum = parseInt(testnumstr,10);
+				console.log("testNum is %d",testNum);
+			}
+			else
+			{
+				console.log("Not found testnumstr.");
+				testNum = 1;
+				testNumStorage.setItem("TestNum",testNum.toString());
+			}
+		}
+		else
+		{
+			alert("不支持数据保存功能，请更换浏览器");
+		}
+	</script>
+</body>
+</html>
